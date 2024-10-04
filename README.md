@@ -1,6 +1,7 @@
 # Battlesnake Python Starter Project
 
-## Getting Started
+Git
+
 ```bash
 # setup venv
 python3 -m venv "battlesnake"
@@ -11,6 +12,8 @@ python main.py
 # Copy battlesnake.exe to this directory
 ./battlesnake.exe play -W 11 -H 11 --name 'PBL 7' --url http://localhost:8000 -g solo --browser
 ```
+
+## Getting Started
 
 An official Battlesnake template written in Python. Get started at [play.battlesnake.com](https://play.battlesnake.com).
 
