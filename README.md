@@ -1,6 +1,26 @@
 # Battlesnake Python Starter Project
 
-Git
+Git の使い方
+```bash
+# リポジトリをローカルにクローン
+git clone https://github.com/Harineko0/pbl-battlesnake
+
+# リポジトリに変更を加える
+git checkout -b feat/変更したい内容を端的に表した言葉 ## 例: git checkout -b feat/customize-snake
+
+# ファイルを追加した後
+git add -A
+
+# 変更を確定するとき
+git commit -am "コミットメッセージ" # 例: git commit -am "MODIFY :ヘビの色を緑に変更"
+
+# 変更を GitHub にアップロードするとき
+git push origin HEAD
+
+# 1. https://github.com/Harineko0/pbl-battlesnake/pulls の New pull request ボタンをクリックし, Pull Request を作成する
+# 2. Slack で誰かにレビューを依頼する
+# 3. Pull Request のページ下部からマージする
+```
 
 ```bash
 # setup venv
