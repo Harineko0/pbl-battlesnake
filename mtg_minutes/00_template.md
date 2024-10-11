@@ -5,7 +5,7 @@
 - 出席:
   - 陶山聡太 (Harineko0)
   - 林宏祐 (Wadon1011)
-  - 宮永真宏 (butasun)
+  - buhibuhi (butasun)
   - 中沖光太郎 (KotaroNakaoki)
   - 久野要 (KunoKaname)
 - 欠席:
