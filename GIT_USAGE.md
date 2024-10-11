@@ -42,3 +42,8 @@ git checkout abcd123 -b feat/some-feature
 # 誤った commit  を feat/some-feature ブランチに取り込む (ここでは誤った commit の commit id を仮に xyzw456 pqrs789 とする)
 git cherry-pick xyzw456 pqrs789
 ```
+
+## conflict したとき
+https://docs.github.com/ja/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-on-github
+
+https://docs.github.com/ja/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line
