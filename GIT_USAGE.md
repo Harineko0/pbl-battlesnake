@@ -1,4 +1,3 @@
-![image](https://github.com/user-attachments/assets/a43274bd-7fb0-41a4-b688-756c796d9fc1)# Git / GitHub Usage
 ## 初回のみ
 ```bash
 # リポジトリをローカルにクローン
@@ -31,3 +30,15 @@ git push origin HEAD
 4. PR ページのリンクを Slack で共有し, レビューを依頼 (例: https://github.com/Harineko0/pbl-battlesnake/pull/3)
    ![image](https://github.com/user-attachments/assets/26cbe7f8-694d-4b94-b64d-80fc8d71bf7f)
 5. レビューが終わったら **Merge pull request** でマージ
+
+## 誤って main に commit したとき
+```bash
+# 以下のコマンドを実行し, 誤った commit の直前の commit id を確認 (ここでは仮に abcd123 とする)
+git log --oneline
+
+# その commit からブランチを切る
+git checkout abcd123 -b feat/some-feature
+
+# 誤った commit  を feat/some-feature ブランチに取り込む (ここでは誤った commit の commit id を仮に xyzw456 pqrs789 とする)
+git cherry-pick xyzw456 pqrs789
+```
