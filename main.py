@@ -57,7 +57,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
     # We've included code to prevent your Battlesnake from moving backwards
     body = game_state["you"]["body"]
     my_head = body[0]  # Coordinates of your head
-    my_tail = body[body.length - 1]  # Coordinates of your "neck"
+    my_tail = body[:-1]  # Coordinates of your "neck"
 
     heat_map.updateValuesByMoving(
         head=(my_head["x"], my_head["y"]), tail=(my_tail["x"], my_tail["y"])
