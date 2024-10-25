@@ -61,7 +61,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
     my_head = body[0]  # Coordinates of your head
     my_tail = body[-1]  # Coordinates of your "neck"
 
-    heat_map.updateValuesByMoving(
+    heat_map.updateMapByMoving(
         head=(my_head["x"], my_head["y"]), tail=(my_tail["x"], my_tail["y"])
     )
 
