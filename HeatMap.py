@@ -1,7 +1,8 @@
 import numpy as np
 import math
 
-moves = ["up", "down", "left", "right"]
+moves = ["down", "up", "left", "right"]
+NEG_INF: int = -128
 
 
 # ヒートマップ class. 正の方が好ましい
@@ -12,11 +13,11 @@ class HeatMap:
 
         # 端は負の無限
         ## row
-        map[0] = -math.inf
-        map[height + 1] = -math.inf
+        map[0] = NEG_INF
+        map[height + 1] = NEG_INF
         ## column
-        map[:0] = -math.inf
-        map[: width + 1] = -math.inf
+        map[:, 0] = NEG_INF
+        map[:, width + 1] = NEG_INF
 
         # set members
         self._map = map
@@ -40,13 +41,16 @@ class HeatMap:
             return ""
 
         map = self._map
-        maxVal = -math.inf
+        maxVal = NEG_INF
         dir = ""
 
-        for val, i in enumerate(
-            # up, down, left, right
-            [map[x + 1, y], map[x - 1, y], map[x, y - 1], map[x, y + 1]]
+        print(coord)
+        print(map)
+        for i, val in enumerate(
+            # down, up, left, right
+            [map[y - 1, x], map[y + 1, x], map[y, x - 1], map[y, x + 1]]
         ):
+            print(val, i)
             if val > maxVal:
                 maxVal = val
                 dir = moves[i]
@@ -56,10 +60,12 @@ class HeatMap:
     def updateValuesByMoving(self, head: tuple[int, int], tail: tuple[int, int]):
         queue = self._snake_queue
         queue.append(head)
-        self._map[head[0], head[1]] = -math.inf
+        # print(queue, head, tail)
+        self._map[head[1] + 1, head[0] + 1] = NEG_INF
+        # print(self._map)
 
         # しっぽの位置が変わった
         if queue[-1] != tail:
             # 初期化. TODO: 0 ではなく正しいスコアを設定
-            self._map[tail[0], tail[1]] = 0
+            self._map[tail[1] + 1, tail[0] + 1] = 0
             queue.pop(0)
