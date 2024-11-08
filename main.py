@@ -60,10 +60,15 @@ def move(game_state: typing.Dict) -> typing.Dict:
     body = game_state["you"]["body"]
     my_head = body[0]  # Coordinates of your head
     my_tail = body[-1]  # Coordinates of your "neck"
+    my_head_tuple = (my_head["x"], my_head["y"])
+    my_tail_tuple = (my_tail["x"], my_tail["y"])
 
-    heat_map.updateMapByMoving(
-        head=(my_head["x"], my_head["y"]), tail=(my_tail["x"], my_tail["y"])
+    heat_map.updateMapByFood(
+        foods=game_state["board"]["food"],
+        health=game_state["you"]["health"],
+        head=my_head_tuple,
     )
+    heat_map.updateMapByMoving(head=my_head_tuple, tail=my_tail_tuple)
 
     # TODO: Step 1 - Prevent your Battlesnake from moving out of bounds
     # board_width = game_state['board']['width']
@@ -85,7 +90,9 @@ def move(game_state: typing.Dict) -> typing.Dict:
     # TODO: Step 4 - Move towards food instead of random, to regain health and survive longer
     # food = game_state['board']['food']
 
-    print(f"MOVE {game_state['turn']}: {next_move}")
+    print(
+        f"MOVE {game_state['turn']}: {next_move.ljust(4)}, health: {game_state['you']['health']}"
+    )
     return {"move": next_move}
 
 
