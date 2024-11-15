@@ -7,7 +7,7 @@ pip install -r .\requirements.txt
 python main.py
 
 # Copy battlesnake.exe to this directory
-./battlesnake.exe play -W 11 -H 11 --name 'PBL 7' --url http://localhost:8000 -g solo --browser
+./battlesnake.exe play -W 6 -H 6 --foodSpawnChance 0 --minimumFood 3 --name 'PBL 7' --url http://localhost:8000 -g solo --browser
 ```
 
 ## Getting Started
