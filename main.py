@@ -54,8 +54,6 @@ def end(game_state: typing.Dict):
 def move(game_state: typing.Dict) -> typing.Dict:
     global heat_map
 
-    is_move_safe = {"up": True, "down": True, "left": True, "right": True}
-
     # We've included code to prevent your Battlesnake from moving backwards
     body = game_state["you"]["body"]
     my_head = body[0]  # Coordinates of your head
@@ -63,24 +61,13 @@ def move(game_state: typing.Dict) -> typing.Dict:
     my_head_tuple = (my_head["x"], my_head["y"])
     my_tail_tuple = (my_tail["x"], my_tail["y"])
 
+    heat_map.updateMapByMoving(head=my_head_tuple, tail=my_tail_tuple)
     heat_map.updateMapByFood(
         foods=game_state["board"]["food"],
         health=game_state["you"]["health"],
         head=my_head_tuple,
     )
-    heat_map.updateMapByMoving(head=my_head_tuple, tail=my_tail_tuple)
-
-    # TODO: Step 1 - Prevent your Battlesnake from moving out of bounds
-    # board_width = game_state['board']['width']
-    # board_height = game_state['board']['height']
-
-    # TODO: Step 2 - Prevent your Battlesnake from colliding with itself
-    # my_body = game_state['you']['body']
-
-    # TODO: Step 3 - Prevent your Battlesnake from colliding with other Battlesnakes
-    # opponents = game_state['board']['snakes']
-
-    # Choose a random move from the safe ones
+    heat_map.updateMapByDeadend(head=my_head_tuple)
     next_move = heat_map.getSafeMove(coord=(my_head["x"], my_head["y"]))
 
     if next_move == "":
@@ -93,6 +80,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
     print(
         f"MOVE {game_state['turn']}: {next_move.ljust(4)}, health: {game_state['you']['health']}"
     )
+    print("---------------------")
     return {"move": next_move}
 
 
