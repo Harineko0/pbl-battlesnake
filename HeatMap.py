@@ -9,7 +9,7 @@ moves = ["down", "up", "left", "right"]
 
 PROHIBIT_SCORE = -1024
 EDGE_SCORE = -10
-DEADEND_SCORE = -1024
+DEADEND_SCORE = -512
 FOOD_SCORE = 512
 FOOD_NEARBY_SCORE = 6
 TAIL_SCORE = 256
@@ -89,30 +89,30 @@ class HeatMap:
 
         return dir
 
-    def updateMapByMoving(self, head: tuple[int, int], tail: tuple[int, int]):
-        queue = self._snake_queue
+    def updateMapByMoving(self, body: list[tuple[int, int]]):
         snake_map = self._snake_map
+        snake_map.fill(0)
 
-        h_x, h_y = head
+        for b in body:
+            x = b[0] + 1
+            y = b[1] + 1
+            snake_map[y, x] = PROHIBIT_SCORE
 
-        snake_map[h_y + 1, h_x + 1] = PROHIBIT_SCORE
-        queue.append(head)
+        # queue = self._snake_queue
+        # snake_map = self._snake_map
 
-        t_x, t_y = tail
+        # h_x, h_y = head
 
-        # 最初のみしっぽの位置を設定
-        # if len(queue) <= 1:
-        #     snake_map[t_y + 1, t_x + 1] = PROHIBIT_SCORE
-        #     queue.append(tail)
+        # snake_map[h_y + 1, h_x + 1] = PROHIBIT_SCORE
+        # queue.append(head)
 
-        # しっぽの位置が変わった (食べ物食べてない)
-        if queue[-1] != tail and len(queue) > 2:
-            # reset
-            snake_map[t_y + 1, t_x + 1] = 0
-            # snake_map[t_y + 1, t_x + 1] = TAIL_SCORE
-            # old_tail = queue.pop(0)
-            # ot_x, ot_y = old_tail
-            # snake_map[ot_y + 1, ot_/x + 1] = 0
+        # t_x, t_y = tail
+
+        # # しっぽの位置が変わった (食べ物食べてない)
+        # if queue[-1] != tail and len(queue) > 2:
+        #     # reset
+        #     snake_map[t_y + 1, t_x + 1] = 0
+        #     queue.pop(0)
 
     def updateMapByFood(
         self,
@@ -215,7 +215,7 @@ class HeatMap:
 
         # print(f"food_map: \n{food_map}")
 
-    def updateMapByDeadend(self, head: tuple[int, int]):
+    def updateMapByDeadend(self, head: tuple[int, int], tail: tuple[int, int]):
         prohibit_map = np.zeros_like(self._border_map)
         prohibit_map += self._border_map
         prohibit_map += self._snake_map
@@ -229,11 +229,14 @@ class HeatMap:
             "right": np.zeros_like(prohibit_map),
         }
 
+        # しっぽが存在する方向
+        tail_direction = ""
+
         width = len(prohibit_map[0])
         height = len(prohibit_map)
 
-        def search(x: int, y: int, area_map: NDArray) -> int:
-            # out of board
+        def search(x: int, y: int, area_map: NDArray, dir: str) -> int:
+            # 範囲外なら 0
             if (
                 x < 0
                 or y < 0
@@ -243,28 +246,35 @@ class HeatMap:
             ):
                 return 0
 
-            # 探索済み
+            # 探索済みなら 0
             if all_area_map[y, x] != 0:
                 return 0
+
+            # しっぽなら
+            if (x, y) == tail:
+                nonlocal tail_direction
+                tail_direction = dir
 
             area_map[y, x] = 1
             all_area_map[y, x] = 1
 
             return (
-                search(x, y - 1, area_map)
-                + search(x, y + 1, area_map)
-                + search(x - 1, y, area_map)
-                + search(x + 1, y, area_map)
+                search(x, y - 1, area_map, dir)
+                + search(x, y + 1, area_map, dir)
+                + search(x - 1, y, area_map, dir)
+                + search(x + 1, y, area_map, dir)
             ) + 1
 
         h_x = head[0] + 1
         h_y = head[1] + 1
         area_map = {
-            "up": search(h_x, h_y + 1, area_array_maps["up"]),
-            "down": search(h_x, h_y - 1, area_array_maps["down"]),
-            "left": search(h_x - 1, h_y, area_array_maps["left"]),
-            "right": search(h_x + 1, h_y, area_array_maps["right"]),
+            "up": search(h_x, h_y + 1, area_array_maps["up"], "up"),
+            "down": search(h_x, h_y - 1, area_array_maps["down"], "down"),
+            "left": search(h_x - 1, h_y, area_array_maps["left"], "left"),
+            "right": search(h_x + 1, h_y, area_array_maps["right"], "right"),
+            "": 0,
         }
+        area_map[tail_direction] *= 2
         print(f"head: {head}")
         # print(f"all_area_map: \n{all_area_map}")
         # print(f"prohibit_map: \n{prohibit_map}")

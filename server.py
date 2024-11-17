@@ -1,16 +1,11 @@
 import logging
-import os
 import typing
-import argparse
 
 from flask import Flask
 from flask import request
 
-arg_parser = argparse.ArgumentParser()
-arg_parser.add_argument("port", help="foooo")
 
-
-def run_server(handlers: typing.Dict):
+def run_server(handlers: typing.Dict, port: int):
     app = Flask("Battlesnake")
 
     @app.get("/")
@@ -40,7 +35,6 @@ def run_server(handlers: typing.Dict):
         return response
 
     host = "0.0.0.0"
-    port = int(os.environ.get("PORT", "8000"))
 
     logging.getLogger("werkzeug").setLevel(logging.ERROR)
 

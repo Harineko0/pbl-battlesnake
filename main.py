@@ -13,6 +13,10 @@
 import random
 import typing
 from HeatMap import HeatMap
+import argparse
+
+arg_parser = argparse.ArgumentParser(description="Battlesnake Server")
+arg_parser.add_argument("--port", help="server port")
 
 
 # info is called when you create your Battlesnake on play.battlesnake.com
@@ -61,13 +65,15 @@ def move(game_state: typing.Dict) -> typing.Dict:
     my_head_tuple = (my_head["x"], my_head["y"])
     my_tail_tuple = (my_tail["x"], my_tail["y"])
 
-    heat_map.updateMapByMoving(head=my_head_tuple, tail=my_tail_tuple)
+    body_tuple = [(b["x"], b["y"]) for b in body]
+
+    heat_map.updateMapByMoving(body=body_tuple)
     heat_map.updateMapByFood(
         foods=game_state["board"]["food"],
         health=game_state["you"]["health"],
         head=my_head_tuple,
     )
-    heat_map.updateMapByDeadend(head=my_head_tuple)
+    heat_map.updateMapByDeadend(head=my_head_tuple, tail=my_tail_tuple)
     next_move = heat_map.getSafeMove(coord=(my_head["x"], my_head["y"]))
 
     if next_move == "":
@@ -88,4 +94,9 @@ def move(game_state: typing.Dict) -> typing.Dict:
 if __name__ == "__main__":
     from server import run_server
 
-    run_server({"info": info, "start": start, "move": move, "end": end})
+    port = arg_parser.parse_args().port
+
+    run_server(
+        {"info": info, "start": start, "move": move, "end": end},
+        port=port if port else 8080,
+    )
