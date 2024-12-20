@@ -56,11 +56,13 @@ def end(game_state: typing.Dict):
 def move(game_state: typing.Dict) -> typing.Dict:
     my_body = [(body["x"], body["y"]) for body in game_state["board"]["snakes"][my_snake_number]["body"]]
     enemy_body = [(body["x"], body["y"]) for body in game_state["board"]["snakes"][enemy_snake_number]["body"]]
+    foods = [(food["x"], food["y"]) for food in game_state["board"]["food"]]
 
     board_state = BoardState(my_body=my_body, 
                              enemy_body=enemy_body, 
                              my_health=game_state["board"]["snakes"][my_snake_number]["health"], 
                              enemy_health=game_state["board"]["snakes"][enemy_snake_number]["health"],
+                             foods=foods
                             )
     
     next_move = alpha_beta_action(board_state=board_state)

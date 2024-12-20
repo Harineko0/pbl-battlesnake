@@ -6,7 +6,8 @@ class BoardState:
                  my_body: list[tuple[int, int]],
                  enemy_body: list[tuple[int, int]],
                  my_health: int,
-                 enemy_health: int
+                 enemy_health: int,
+                 foods: list[tuple[int, int]]
                  ):
         
         # set members
@@ -14,6 +15,7 @@ class BoardState:
         self._enemy_body = enemy_body
         self._my_health = my_health
         self._enemy_health = enemy_health
+        self._foods = foods
 
     def getScore(self) -> int:
         board_score = BoardScore()
@@ -24,6 +26,7 @@ class BoardState:
 
         # 相手のheadとの位置で更新
         board_score.updateScoreByHead(my_body=self._my_body, enemy_body=self._enemy_body)
+        board_score.updateScoreByLength(my_body=self._my_body, enemy_body=self._enemy_body)
 
         return board_score.score
         
@@ -65,13 +68,16 @@ class BoardState:
         
         return moves
     
-    # TODO 餌を食べた時の処理を追加
     def next(self, move: tuple[int, int], depth: int):
         if (depth % 2 == 1):
             # print(f"current_my_body:{self._my_body}")
             my_body = self._my_body.copy()
             my_body.insert(0, move)
-            my_body.pop()
+            foods = self._foods.copy()
+            if move in self._foods:
+                foods.remove(move)
+            else:
+                my_body.pop()
             my_health =  self._my_health -1
 
             enemy_body =  self._enemy_body.copy()
@@ -80,7 +86,11 @@ class BoardState:
         else:
             enemy_body = self._enemy_body.copy()
             enemy_body.insert(0, move)
-            enemy_body.pop()
+            foods = self._foods.copy()
+            if move in self._foods:
+                foods.remove(move)
+            else:
+                enemy_body.pop()
             enemy_health =  self._enemy_health -1
 
             my_body =  self._my_body.copy()
@@ -89,4 +99,5 @@ class BoardState:
         return BoardState(my_body=my_body, 
                           enemy_body=enemy_body,
                           my_health=my_health,
-                          enemy_health=enemy_health)
+                          enemy_health=enemy_health,
+                          foods=foods)

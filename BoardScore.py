@@ -9,7 +9,7 @@ class BoardScore:
 
     def updateScoreByEdge(self, head: tuple[int, int], enemy = False):
         """
-        相手が端にいるときに10点加点，自分が端にいるときに10点減点
+        相手が端にいるときに10点加点，自分が端にいるときに100点減点
         """
         if enemy:
             coefficient = 1
@@ -17,13 +17,13 @@ class BoardScore:
             coefficient = -1
         
         if head[0] == 0:
-            self.score += coefficient * 10
+            self.score += coefficient * 100
         if head[0] == 11:
-            self.score += coefficient * 10
+            self.score += coefficient * 100
         if head[1] == 0:
-            self.score += coefficient * 10
+            self.score += coefficient * 100
         if head[1] == 11:
-            self.score += coefficient * 10
+            self.score += coefficient * 100
         
     def updateScoreByHead(self, 
                        my_body: list[tuple[int, int]],
@@ -34,11 +34,20 @@ class BoardScore:
         """
         if len(my_body) > len(enemy_body):
             if isAroundHead(my_head=my_body[0], enemy_head=enemy_body[0]):
-                self.score += 100
+                self.score += 50
         else:
             if isAroundHead(my_head=my_body[0], enemy_head=enemy_body[0]):
-                self.score += -100
+                self.score += -50
 
     # TODO 処理を追加
     def updateScoreByFood():
         pass
+
+    def updateScoreByLength(self, 
+                            my_body: list[tuple[int, int]],
+                            enemy_body: list[tuple[int, int]]
+                            ):
+        if(len(my_body) > len(enemy_body)):
+            self.score += 50
+        else:
+            self.score += len(my_body)
