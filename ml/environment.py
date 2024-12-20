@@ -83,7 +83,8 @@ class Battlesnake:
         if self.health <= 0:
             return True, Cause.OUT_OF_HEALTH
         
-        np.append(self.body, [self.head], axis=0)
+        # add head to top of body
+        self.body = np.insert(self.body, 0, self.head, axis=0)
         
         # food を食べる
         if foods[self.head[0], self.head[1]] == 1:
@@ -91,7 +92,8 @@ class Battlesnake:
             foods[self.head[0], self.head[1]] = 0
         else:
             self.health -= 1
-            np.delete(self.body, -1)
+            # remove tail
+            self.body = self.body[:-1]
             
         return False, Cause.NONE
 
@@ -124,7 +126,11 @@ class Foods:
 
     def consume(self, position: NDArray):
         index = np.where(np.all(self.food == position, axis=1))
+        print('start consume!')
+        print(self.food)
         self.food = np.delete(self.food, index, axis=0)
+        print(self.food)
+        print('end consume')
         new_food = self._get_random_position(np.concatenate([snake.body for snake in self.snakes], axis=0), size=1)
         self.food = np.append(self.food, new_food, axis=0)
         
@@ -156,6 +162,7 @@ class LocalBattlesnakeEnv:
     def __init__(self, size: int = 11, seed: int = None):
         self.size = size
         self.seed = seed
+        self.done = False
         
     
     """
@@ -168,15 +175,23 @@ class LocalBattlesnakeEnv:
         done: ゲームが終了したかどうか
     """
     def step(self, action: int) -> tuple[NDArray, float, bool]:
+        if self.done:
+            raise Exception('Game is already done')
+        
         foods = self.foods.get_state()
         
         if self.turn == 0:
             done, cause = self.me.move(action, foods)
+            if done:
+                print(cause)
             self.turn = 1
         else:
             done, cause = self.you.move(action, foods)
+            if done:
+                print(cause)
             self.turn = 0
-            
+        
+        self.done = done
         state = self.get_state()
         reward = self.get_reward(me=self.me, you=self.you, foods=foods, done=done, cause=cause)
         
@@ -244,8 +259,6 @@ class LocalBattlesnakeEnv:
         y_head, y_body = self.you.get_state()
         f = self.foods.get_state()
         
-        print('-----------')
         print(self.turn)
-        print(m_body)
-        print(y_body)
-        print(f) 
+        print(m_body + m_head * 2 + y_body * 4 + y_head * 8 + f * 16)
+        print('-----------')
