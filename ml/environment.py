@@ -40,8 +40,6 @@ class Battlesnake:
         self.health = health
         self.size = size
         self.oppoent = opponent
-        
-        print(self.body)
     
     def __len__(self):
         return self.body.shape[0]
@@ -51,12 +49,12 @@ class Battlesnake:
     
     Args:
         action: 0 ~ 3 の整数で進む方向を指定する. 0: 上, 1: 下, 2: 左, 3: 右
-        foods: 食べ物の位置を表す行列
+        foods: Foods class
         
     Returns:
         done: ゲームが終了したかどうか
     """
-    def move(self, action: int, foods: NDArray) -> Tuple[bool, Cause]:
+    def move(self, action: int, foods) -> Tuple[bool, Cause]:
         # 動かす
         if action == 0:
             self.head[0] -= 1
@@ -87,13 +85,13 @@ class Battlesnake:
         self.body = np.insert(self.body, 0, self.head, axis=0)
         
         # food を食べる
-        if foods[self.head[0], self.head[1]] == 1:
+        if foods.exists(self.head):
+            foods.consume(self.head)
             self.health = 100
-            foods[self.head[0], self.head[1]] = 0
         else:
-            self.health -= 1
             # remove tail
             self.body = self.body[:-1]
+            self.health -= 1
             
         return False, Cause.NONE
 
@@ -117,22 +115,23 @@ class Foods:
         if seed is not None:
             np.random.seed(seed)
         
-        self.food = self._get_random_position(np.concatenate([snake.body for snake in snakes], axis=0), size=amount)
         self.size = size
         self.snakes = snakes
+        self.food = self._get_random_position(np.concatenate([snake.body for snake in snakes], axis=0), amount=amount)
 
     def exists(self, position: NDArray) -> bool:
-        return np.all(self.food == position)
+        return np.any(np.all(self.food == position, axis=1))
 
     def consume(self, position: NDArray):
         index = np.where(np.all(self.food == position, axis=1))
-        print('start consume!')
-        print(self.food)
+        
+        # 食べた食べ物を削除
         self.food = np.delete(self.food, index, axis=0)
-        print(self.food)
-        print('end consume')
-        new_food = self._get_random_position(np.concatenate([snake.body for snake in self.snakes], axis=0), size=1)
+        
+        # 新しい食べ物を追加
+        new_food = self._get_random_position(np.concatenate([snake.body for snake in self.snakes], axis=0), amount=1)
         self.food = np.append(self.food, new_food, axis=0)
+        
         
     def get_state(self) -> NDArray:
         food_mat = np.zeros((self.size, self.size), dtype=int)
@@ -146,8 +145,8 @@ class Foods:
         constraints: NDArray[Tuple[int, int]]: 位置の候補の制約
         size: 返却する位置の数
     """ 
-    def _get_random_position(self, constraints: NDArray, size: int = 3) -> NDArray:
-        all_possible_vectors = np.array(np.meshgrid(np.arange(size), np.arange(size))).T.reshape(-1, 2)
+    def _get_random_position(self, constraints: NDArray, amount: int = 3) -> NDArray:
+        all_possible_vectors = np.array(np.meshgrid(np.arange(self.size), np.arange(self.size))).T.reshape(-1, 2)
         mask = np.ones(len(all_possible_vectors), dtype=bool)
             
         for con in constraints:
@@ -155,7 +154,7 @@ class Foods:
         
         possible_cells = all_possible_vectors[mask]
         
-        return possible_cells[np.random.randint(len(possible_cells), size=size + 1)]
+        return possible_cells[np.random.randint(len(possible_cells), size=amount)]
 
 
 class LocalBattlesnakeEnv:
@@ -178,22 +177,20 @@ class LocalBattlesnakeEnv:
         if self.done:
             raise Exception('Game is already done')
         
-        foods = self.foods.get_state()
-        
         if self.turn == 0:
-            done, cause = self.me.move(action, foods)
+            done, cause = self.me.move(action, self.foods)
             if done:
                 print(cause)
             self.turn = 1
         else:
-            done, cause = self.you.move(action, foods)
+            done, cause = self.you.move(action, self.foods)
             if done:
                 print(cause)
             self.turn = 0
         
         self.done = done
         state = self.get_state()
-        reward = self.get_reward(me=self.me, you=self.you, foods=foods, done=done, cause=cause)
+        reward = self.get_reward(me=self.me, you=self.you, foods=self.foods, done=done, cause=cause)
         
         return state, reward, done
     
