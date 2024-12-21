@@ -1,53 +1,34 @@
-from Helpers import isAroundHead
-
 class BoardScore:
     """
     初期値0のscoreをupdateして返すクラス
+    scoreは-9999から9999の範囲とする
     """
     def __init__(self):
         self.score = 0
 
-    def updateScoreByEdge(self, head: tuple[int, int], enemy = False):
+    def updateScoreByHead(self, head: tuple[int, int], enemy = False):
         """
-        相手が端にいるときに10点加点，自分が端にいるときに100点減点
+        自分が盤面の真ん中から遠いほど減点
+        相手が盤面の真ん中から遠いほど加点
         """
         if enemy:
             coefficient = 1
         else:
             coefficient = -1
-        
-        if head[0] == 0:
-            self.score += coefficient * 100
-        if head[0] == 11:
-            self.score += coefficient * 100
-        if head[1] == 0:
-            self.score += coefficient * 100
-        if head[1] == 11:
-            self.score += coefficient * 100
-        
-    def updateScoreByHead(self, 
-                       my_body: list[tuple[int, int]],
-                       enemy_body: list[tuple[int, int]],):
-        """
-        相手より大きいとき、相手の斜めにいるなら100点加点.
-        相手以下の大きさのとき、相手の斜めにいるなら100点減点.
-        """
-        if len(my_body) > len(enemy_body):
-            if isAroundHead(my_head=my_body[0], enemy_head=enemy_body[0]):
-                self.score += 50
-        else:
-            if isAroundHead(my_head=my_body[0], enemy_head=enemy_body[0]):
-                self.score += -50
 
-    # TODO 処理を追加
-    def updateScoreByFood():
-        pass
+        self.score += coefficient * abs(5 - head[0])
+        self.score += coefficient * abs(5 - head[1])
+        
 
     def updateScoreByLength(self, 
                             my_body: list[tuple[int, int]],
                             enemy_body: list[tuple[int, int]]
                             ):
+        """
+        自分の長さ - 相手の長さを加点
+        相手より長ければ10点加点
+        """
         if(len(my_body) > len(enemy_body)):
-            self.score += 50
-        else:
-            self.score += len(my_body)
+             self.score += 10
+
+        self.score += len(my_body) - len(enemy_body)

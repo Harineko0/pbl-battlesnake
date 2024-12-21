@@ -2,20 +2,14 @@ import math
 
 # アルファベータ法で状態価値計算
 def alpha_beta(board_state, alpha, beta, depth):
-    if board_state.youLose():
-        # 自分のターン
-        if depth % 2 == 1:
-            return math.inf
-        else:
-            return -math.inf
+    if depth % 2 == 0:
+        if board_state.youLose():
+            return -(13 - depth) * 10000
+        
+        if board_state.youWin():
+            return (13 - depth) * 10000
     
-    if board_state.youWin():
-        if depth % 2 == 1:
-            return -math.inf
-        else:
-            return math.inf
-    
-    if depth >= 14:
+    if depth >= 12:
         return board_state.getScore()
 
     # 合法手の状態価値の計算

@@ -1,16 +1,3 @@
-def isAroundHead(my_head: tuple[int, int],
-                 enemy_head: tuple[int, int]) -> bool:
-    """相手の斜めに自分のheadがあるかどうかを判定
-    """
-    a = (my_head[0] + 1, my_head[1] + 1) == enemy_head
-    b = (my_head[0] + 1, my_head[1] - 1) == enemy_head
-    c = (my_head[0] - 1, my_head[1] + 1) == enemy_head
-    d = (my_head[0] - 1, my_head[1] - 1) == enemy_head
-
-    if a or b or c or d:
-        return True
-    return False
-
 def getSafeMoves(head: tuple[int, int]):
     moves = []
 
