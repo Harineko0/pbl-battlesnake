@@ -7,7 +7,21 @@ def alpha_beta(board_state, alpha, beta, depth):
             return -(13 - depth) * 10000
         
         if board_state.youWin():
-            return (13 - depth) * 10000
+            return (13 - depth) * 10000        
+    
+    # TODO こっちのほうが早い？要確認
+    # if board_state.youLose():
+    #     # 自分のターン
+    #     if depth % 2 == 1:
+    #         return (15 - depth) * 10000
+    #     else:
+    #         return -(15 - depth) * 10000
+
+    # if board_state.youWin():
+    #     if depth % 2 == 1:
+    #         return -(15 - depth) * 10000
+    #     else:
+    #        return (15 - depth) * 10000
     
     if depth >= 12:
         return board_state.getScore()
