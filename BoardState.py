@@ -17,6 +17,7 @@ class BoardState:
         self._enemy_health = enemy_health
         self._foods = foods
 
+
     def getScore(self) -> int:
         """
         盤面の評価を入手
@@ -37,23 +38,24 @@ class BoardState:
         """
         勝ちを判定
         """
-        a = self._enemy_body[0] in self._my_body[1:]
-        b = self._enemy_body[0] in self._enemy_body[1:]
-        c = self._enemy_health <= 0
-        d = len(self._my_body) > len(self._enemy_body) and self._my_body[0] == self._enemy_body[0]
-
-        return a or b or c or d
+        return any([
+            self._enemy_health <= 0,
+            self._enemy_body[0] in self._enemy_body[1:],
+            self._enemy_body[0] in self._my_body[1:],
+            len(self._my_body) > len(self._enemy_body) and self._my_body[0] == self._enemy_body[0],
+        ])
+    
 
     def youLose(self) -> bool:
         """
         負けを判定
         """
-        a = self._my_body[0] in self._enemy_body[1:]
-        b = self._my_body[0] in self._my_body[1:]
-        c = self._my_health <= 0
-        d = len(self._my_body) <= len(self._enemy_body) and self._my_body[0] == self._enemy_body[0]
-        
-        return a or b or c or d
+        return any([
+            self._my_health <= 0,
+            self._my_body[0] in self._my_body[1:],
+            self._my_body[0] in self._enemy_body[1:],
+            len(self._my_body) <= len(self._enemy_body) and self._my_body[0] == self._enemy_body[0],
+        ])
 
 
     def getLegalMoves(self, depth) -> list[tuple[int, int]]:
@@ -66,6 +68,7 @@ class BoardState:
             moves = getSafeMoves(head=self._enemy_body[0])
         
         return moves
+
     
     def next(self, move: tuple[int, int], depth: int):
         """

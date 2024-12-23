@@ -1,3 +1,18 @@
+map_score=[
+    [10, 9, 8, 7, 6, 5, 6, 7, 8, 9, 10],
+    [9 , 8, 7, 6, 5, 4, 5, 6, 7, 8,  9],
+    [8 , 7, 6, 5, 4, 3, 4, 5, 6, 7,  8],
+    [7 , 6, 5, 4, 3, 2, 3, 4, 5, 6,  7],
+    [6 , 5, 4, 3, 2, 1, 2, 3, 4, 5,  6],
+    [5 , 4, 3, 2, 1, 0, 1, 2, 3, 4,  5],
+    [6 , 5, 4, 3, 2, 1, 2, 3, 4, 5,  6],
+    [7 , 6, 5, 4, 3, 2, 3, 4, 5, 6,  7],
+    [8 , 7, 6, 5, 4, 3, 4, 5, 6, 7,  8],
+    [9 , 8, 7, 6, 5, 4, 5, 6, 7, 8,  9],
+    [10, 9, 8, 7, 6, 5, 6, 7, 8, 9, 10]
+]
+
+
 class BoardScore:
     """
     初期値0のscoreをupdateして返すクラス
@@ -5,6 +20,7 @@ class BoardScore:
     """
     def __init__(self):
         self.score = 0
+
 
     def updateScoreByHead(self, head: tuple[int, int], enemy = False):
         """
@@ -17,8 +33,7 @@ class BoardScore:
             coefficient = -1
 
         # TODO 11 * 11 のリストで場所に対応した値を宣言しておいて、それとheadの位置で決定? 
-        self.score += coefficient * abs(5 - head[0])
-        self.score += coefficient * abs(5 - head[1])
+        self.score += coefficient * map_score[head[0]][head[1]]
         
 
     def updateScoreByLength(self, 
@@ -29,7 +44,7 @@ class BoardScore:
         自分の長さ - 相手の長さを加点
         相手より長ければ10点加点
         """
-        if(len(my_body) > len(enemy_body)):
+        if((length_difference := len(my_body) - len(enemy_body)) > 0):
              self.score += 10
 
-        self.score += len(my_body) - len(enemy_body)
+        self.score += length_difference
