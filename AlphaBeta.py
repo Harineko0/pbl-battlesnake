@@ -1,15 +1,15 @@
 import math
 
 # アルファベータ法で状態価値計算
-def alpha_beta(board_state, alpha, beta, depth):
+def alpha_beta(board_state, alpha, beta, depth, look_ahead_depth):
     if depth % 2 == 0:
         if board_state.youLose():
-            return -(13 - depth) * 10000
+            return -(20 - depth) * 10000
         
         if board_state.youWin():
-            return (13 - depth) * 10000
+            return (20 - depth) * 10000
     
-    if depth >= 12:
+    if depth >= look_ahead_depth:
         return board_state.getScore()
 
     # 合法手の状態価値の計算
@@ -17,7 +17,8 @@ def alpha_beta(board_state, alpha, beta, depth):
         score = -alpha_beta(board_state=board_state.next(move, depth=depth + 1), 
                             alpha=-beta, 
                             beta=-alpha, 
-                            depth=depth + 1)
+                            depth=depth + 1,
+                            look_ahead_depth=look_ahead_depth)
         if score > alpha:
             alpha = score
 
@@ -35,11 +36,19 @@ def alpha_beta_action(board_state, depth = 0):
     best_move = [0, 0]
     alpha = -math.inf
     string_list = ['','']
+    if(len(board_state._my_body) + len(board_state._enemy_body) < 24):
+        look_ahead_depth = 12
+    else:
+        look_ahead_depth = 14
+
+    print(f"先読みターン数: {look_ahead_depth//2}")
+    
     for move in board_state.getLegalMoves(depth = depth): #TODO 本当にこのdepthでいいか？
         score = -alpha_beta(board_state=board_state.next(move, depth = depth + 1), 
                            alpha=-math.inf, 
                            beta=-alpha,
-                           depth=depth + 1)
+                           depth=depth + 1,
+                           look_ahead_depth=look_ahead_depth)
         if score > alpha:
             best_move = move
             alpha = score
