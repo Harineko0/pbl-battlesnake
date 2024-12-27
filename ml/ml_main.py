@@ -8,7 +8,7 @@ import math
 
 print(f"MPS Backend is available? - {"yes" if torch.backends.mps.is_available() else "no"}")
 
-episode_count = 100000
+episode_count = 200000
 sync_interval = 100
 env = LocalEnv()
 ally_agent = Agent(id="ally")
@@ -41,6 +41,7 @@ for episode in range(episode_count):
     if episode % sync_interval == 0:
         ally_agent.sync_target()
         oppoent_agent.sync_target()
+        print(f"Episode: {episode}")
     
     reward_history[episode] = total_reward
     step_history[episode] = step

@@ -6,6 +6,7 @@ from agent import Agent
 env = RemoteEnv(ally_id="ally", opponent_id="opponent")
 agent = Agent(id="ally")
 actions = ["up", "down", "left", "right"]
+direction = ['←', '→', '↑', '↓']
 
 def info() -> typing.Dict:
     print("INFO")
@@ -34,7 +35,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
     next_move = actions[action]
     env.render()
 
-    print(f"MOVE {game_state['turn']}: {next_move}")
+    print(f"MOVE {game_state['turn']}: {next_move} ({direction[action]})")
     return {"move": next_move}
 
 

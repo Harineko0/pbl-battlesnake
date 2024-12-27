@@ -33,15 +33,16 @@ class Battlesnake:
         while head is None or (isinstance(opponent, Battlesnake) and np.any(np.all(opponent.body == head, axis=1))):
             head = np.random.randint(0, size, 2)
         
-        tail = None
-        while tail is None or (isinstance(opponent, Battlesnake) and np.any(np.all(opponent.body == tail, axis=1))):
-            tail = head + [[-1, 0], [1, 0], [0, -1], [0, 1]][np.random.randint(0, 3, 1)[0]]
+        # tail = None
+        # while tail is None or (isinstance(opponent, Battlesnake) and np.any(np.all(opponent.body == tail, axis=1))):
+        #     tail = head + [[-1, 0], [1, 0], [0, -1], [0, 1]][np.random.randint(0, 3, 1)[0]]
         
         self.head = head
-        self.body = np.array([head, tail])
+        self.body = np.array([head])
         self.health = health
         self.size = size
         self.oppoent = opponent
+        self.is_first = True
     
     def __len__(self):
         return self.body.shape[0]
@@ -90,8 +91,10 @@ class Battlesnake:
         # add head to top of body
         self.body = np.insert(self.body, 0, self.head, axis=0)
         
-        # food を食べる
-        if foods.exists(self.head):
+        if self.is_first:
+            self.health -= 1
+            self.is_first = False
+        elif foods.exists(self.head): # food を食べる
             foods.consume(self.head)
             self.health = 100
         else:
