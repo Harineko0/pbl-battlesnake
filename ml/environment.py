@@ -9,9 +9,10 @@ from enum import Enum
 class Cause(Enum):
     WALL = 0
     OUT_OF_HEALTH = 1
-    HIT_OPPONENT = 2
-    HIT_MYSELF = 3
-    NONE = 4
+    HIT_OPPONENT_BODY = 2
+    HIT_OPPONENT_HEAD = 3
+    HIT_MYSELF = 4
+    NONE = 5
 
 
 class Battlesnake:
@@ -73,9 +74,13 @@ class Battlesnake:
         if np.any(np.all(self.body == self.head, axis=1)):
             return True, Cause.HIT_MYSELF
         
+        # 頭同士がぶつかったらゲーム終了
+        if np.all(self.oppoent.head == self.head):
+            return True, Cause.HIT_OPPONENT_HEAD
+        
         # 相手の体にぶつかったらゲーム終了
         if np.any(np.all(self.oppoent.body == self.head, axis=1)):
-            return True, Cause.HIT_OPPONENT
+            return True, Cause.HIT_OPPONENT_BODY
 
         # 体力が尽きたらゲーム終了
         if self.health <= 0:
@@ -102,10 +107,14 @@ class Battlesnake:
     """
     def get_state(self) -> Tuple[NDArray, NDArray]:
         h_mat = np.zeros((self.size, self.size), dtype=int)
-        h_mat[self.head[0], self.head[1]] = 1
+        h_0, h_1 = self.head
+        if 0 <= h_0 < self.size and 0 <= h_1 < self.size:
+            h_mat[h_0, h_1] = 1
         
         b_mat = np.zeros((self.size, self.size), dtype=int)
-        b_mat[self.body[:, 0], self.body[:, 1]] = 1
+        # if body contains out of range position, ignore it
+        safe_body = self.body[(0 <= self.body[:, 0]) & (self.body[:, 0] < self.size) & (0 <= self.body[:, 1]) & (self.body[:, 1] < self.size)]
+        b_mat[safe_body[:, 0], safe_body[:, 1]] = 1
         
         return h_mat, b_mat
 
@@ -157,12 +166,13 @@ class Foods:
         return possible_cells[np.random.randint(len(possible_cells), size=amount)]
 
 
-class LocalBattlesnakeEnv:
+class LocalEnv:
     def __init__(self, size: int = 11, seed: int = None):
         self.size = size
         self.seed = seed
         self.done = False
         
+        print(f"State size: {self.reset().shape[0]}")
     
     """
     Args:
@@ -173,26 +183,27 @@ class LocalBattlesnakeEnv:
         reward: 報酬
         done: ゲームが終了したかどうか
     """
-    def step(self, action: int) -> tuple[NDArray, float, bool]:
+    def step(self, action: int):
         if self.done:
             raise Exception('Game is already done')
         
         if self.turn == 0:
             done, cause = self.me.move(action, self.foods)
             if done:
-                print(cause)
+                # print(cause)
+                self.done = done
             self.turn = 1
         else:
             done, cause = self.you.move(action, self.foods)
             if done:
-                print(cause)
+                # print(cause)
+                self.done = done
             self.turn = 0
         
-        self.done = done
         state = self.get_state()
         reward = self.get_reward(me=self.me, you=self.you, foods=self.foods, done=done, cause=cause)
         
-        return state, reward, done
+        return state, reward, self.done
     
     
     def get_reward(self, me: Battlesnake, you: Battlesnake, foods: Foods, done: bool, cause: Cause) -> float:
@@ -204,7 +215,9 @@ class LocalBattlesnakeEnv:
                 return -2 # 壁にぶつかったら多めに減点
             case Cause.OUT_OF_HEALTH:
                 return -1
-            case Cause.HIT_OPPONENT:
+            case Cause.HIT_OPPONENT_BODY:
+                return -1
+            case Cause.HIT_OPPONENT_HEAD:
                 # 体力が多い方が勝ち
                 if len(me) > len(you):
                     return 1
@@ -221,7 +234,7 @@ class LocalBattlesnakeEnv:
     Returns:
         state: 環境の状態を表す情報
     """
-    def reset(self) -> tuple[NDArray]:
+    def reset(self) -> Tensor:
         if self.seed is not None:
             np.random.seed(self.seed)
                 
@@ -230,6 +243,7 @@ class LocalBattlesnakeEnv:
         self.me.oppoent = self.you
         self.foods      = Foods([self.me, self.you], seed=self.seed, amount=3)
         self.turn       = 0 # 0 for me, 1 for you
+        self.done       = False
         
         return self.get_state()
 
@@ -243,13 +257,13 @@ class LocalBattlesnakeEnv:
         you_h_mat, you_b_mat = self.you.get_state()
         foods_mat = self.foods.get_state()
         
-        return torch.stack([
+        return torch.flatten(torch.cat([
             torch.tensor(me_h_mat, dtype=torch.float32),
             torch.tensor(me_b_mat, dtype=torch.float32),
             torch.tensor(you_h_mat, dtype=torch.float32),
             torch.tensor(you_b_mat, dtype=torch.float32),
             torch.tensor(foods_mat, dtype=torch.float32)
-        ], dim=0)
+        ], dim=0))
     
     def render(self):
         m_head, m_body = self.me.get_state()
