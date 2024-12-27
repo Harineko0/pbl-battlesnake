@@ -3,10 +3,12 @@ from agent import Agent
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
+import time
+import math
 
 print(f"MPS Backend is available? - {"yes" if torch.backends.mps.is_available() else "no"}")
 
-episode_count = 10000
+episode_count = 100000
 sync_interval = 100
 env = LocalEnv()
 ally_agent = Agent(id="ally")
@@ -17,6 +19,8 @@ step_history = np.zeros(episode_count)
 
 ally_agent.load()
 oppoent_agent.load()
+
+start_time = time.time()
 
 for episode in range(episode_count):
     state = env.reset()
@@ -40,6 +44,10 @@ for episode in range(episode_count):
     
     reward_history[episode] = total_reward
     step_history[episode] = step
+
+
+elapsed_time = time.time() - start_time
+print(f"Elapsed time: {math.floor(elapsed_time / 60)}m {math.floor(elapsed_time % 60)}s ({1000 * elapsed_time / episode_count} sec/1000 episodes)")
 
 ally_agent.save()
 oppoent_agent.save()

@@ -4,6 +4,7 @@ from numpy.typing import NDArray
 import torch
 from torch.types import Tensor
 from enum import Enum
+import config
 
 
 class Cause(Enum):
@@ -117,6 +118,16 @@ class Battlesnake:
         b_mat[safe_body[:, 0], safe_body[:, 1]] = 1
         
         return h_mat, b_mat
+    
+    """
+    Args:
+        head: NDArray[int]: ヘッドの位置
+        body: NDArray[Tuple[int, int]]: ボディの位置
+    """
+    def set(self, head: NDArray, body: NDArray, health: int):
+        self.head = head
+        self.body = body
+        self.health = health
 
 
 class Foods:
@@ -164,6 +175,13 @@ class Foods:
         possible_cells = all_possible_vectors[mask]
         
         return possible_cells[np.random.randint(len(possible_cells), size=amount)]
+
+    """
+    Args:
+        food: NDArray[Tuple[int, int]]: 食べ物の位置
+    """
+    def set(self, food: NDArray):
+        self.food = food
 
 
 class LocalEnv:
@@ -257,12 +275,12 @@ class LocalEnv:
         you_h_mat, you_b_mat = self.you.get_state()
         foods_mat = self.foods.get_state()
         
-        return torch.flatten(torch.cat([
-            torch.tensor(me_h_mat, dtype=torch.float32),
-            torch.tensor(me_b_mat, dtype=torch.float32),
-            torch.tensor(you_h_mat, dtype=torch.float32),
-            torch.tensor(you_b_mat, dtype=torch.float32),
-            torch.tensor(foods_mat, dtype=torch.float32)
+        return torch.flatten(torch.stack([
+            torch.tensor(me_h_mat, dtype=torch.float32).to(config.device),
+            torch.tensor(me_b_mat, dtype=torch.float32).to(config.device),
+            torch.tensor(you_h_mat, dtype=torch.float32).to(config.device),
+            torch.tensor(you_b_mat, dtype=torch.float32).to(config.device),
+            torch.tensor(foods_mat, dtype=torch.float32).to(config.device)
         ], dim=0))
     
     def render(self):
@@ -273,3 +291,55 @@ class LocalEnv:
         print(self.turn)
         print(m_body + m_head * 2 + y_body * 4 + y_head * 8 + f * 16)
         print('-----------')
+    
+    def set(self, me_head: NDArray, me_body: NDArray, me_health: int, you_head: NDArray, you_body: NDArray, you_health: int, foods: NDArray, turn: int):
+        self.me.set(me_head, me_body, me_health)
+        self.you.set(you_head, you_body, you_health)
+        self.foods.set(foods)
+        self.turn = turn
+
+
+class RemoteEnv:
+    def __init__(self, ally_id: str, opponent_id: str):
+        self.env = LocalEnv()
+        self.ally_id = ally_id
+        self.opponent_id = opponent_id
+        pass
+    
+    def step(self, action: int):
+        pass
+    
+    def reset(self):
+        self.env.reset()
+
+    def get_state(self):
+        return self.env.get_state()
+    
+    def render(self):
+        self.env.render()
+
+    def set(self, game_state: dict):
+        game, turn, board, you = game_state['game'], game_state['turn'], game_state['board'], game_state['you']
+
+        snakes = board['snakes']
+        ally = [snake for snake in snakes if snake['name'] == self.ally_id][0]
+        opponent = [snake for snake in snakes if snake['name'] == self.opponent_id][0]
+        
+        ally_body = np.array([[body['x'], body['y']] for body in ally['body']])
+        ally_health = you['health']
+        opponent_body = np.array([[body['x'], body['y']] for body in opponent['body']])
+        opponent_health = board['snakes'][0]['health']
+        foods = np.array([[food['x'], food['y']] for food in board['food']])
+        
+        self.env.set(
+            me_head=ally_body[0],
+            me_body=ally_body[1:],
+            me_health=ally_health,
+            you_head=opponent_body[0],
+            you_body=opponent_body[1:],
+            you_health=opponent_health,
+            foods=foods,
+            turn=turn
+        )
+
+# server -> move -> agent -> get_action -> update -> server -> move -> agent -> get_action -> agent -> update -> ...

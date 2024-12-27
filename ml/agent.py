@@ -68,5 +68,5 @@ class Agent:
         
         path = f"{dir}/{path}"
         
-        self.qnet.load_state_dict(torch.load(path))
-        self.qnet_target.load_state_dict(torch.load(path))
+        self.qnet.load_state_dict(torch.load(path, weights_only=True))
+        self.qnet_target.load_state_dict(torch.load(path, weights_only=True))
