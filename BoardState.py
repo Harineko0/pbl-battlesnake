@@ -7,7 +7,8 @@ class BoardState:
                  enemy_body: list[tuple[int, int]],
                  my_health: int,
                  enemy_health: int,
-                 foods: list[tuple[int, int]]
+                 foods: set[tuple[int, int]],
+                 my_eat_food: tuple[int, int] = None
                  ):
         
         # set members
@@ -16,6 +17,7 @@ class BoardState:
         self._my_health = my_health
         self._enemy_health = enemy_health
         self._foods = foods
+        self._my_eat_food = my_eat_food
 
 
     def getScore(self) -> int:
@@ -48,7 +50,7 @@ class BoardState:
 
     def youLose(self) -> bool:
         """
-        負けを判定
+        負け、引き分けを判定
         """
         return any([
             self._my_health <= 0,
@@ -69,17 +71,19 @@ class BoardState:
         
         return moves
 
-    
+
     def next(self, move: tuple[int, int], depth: int):
         """
         次の盤面を取得
         """
+        # TODO 餌を食べたターンの処理を改善(引き分けなのに勝利判定になっている)
         if (depth % 2 == 1):
             my_body = self._my_body.copy()
             my_body.insert(0, move)
             foods = self._foods.copy()
+            my_eat_food = None
             if move in self._foods:
-                foods.remove(move)
+                my_eat_food = move
                 my_health = 100
             else:
                 my_body.pop()
@@ -100,9 +104,13 @@ class BoardState:
 
             my_body =  self._my_body.copy()
             my_health = self._my_health
+            my_eat_food = self._my_eat_food
+            if my_eat_food in foods:
+                foods.remove(my_eat_food)
         
         return BoardState(my_body=my_body, 
                           enemy_body=enemy_body,
                           my_health=my_health,
                           enemy_health=enemy_health,
-                          foods=foods)
+                          foods=foods,
+                          my_eat_food=my_eat_food)

@@ -7,7 +7,8 @@ def alpha_beta(board_state, alpha, beta, depth, look_ahead_depth):
             return -(20 - depth) * 10000
         
         if board_state.youWin():
-            return (20 - depth) * 10000
+            return math.inf #<-こっちのほうが早い?
+            #return (20 - depth) * 10000
     
     if depth >= look_ahead_depth:
         return board_state.getScore()
@@ -42,8 +43,8 @@ def alpha_beta_action(board_state, depth = 0):
         look_ahead_depth = 14
 
     print(f"先読みターン数: {look_ahead_depth//2}")
-    
-    for move in board_state.getLegalMoves(depth = depth): #TODO 本当にこのdepthでいいか？
+
+    for move in board_state.getLegalMoves(depth = depth):
         score = -alpha_beta(board_state=board_state.next(move, depth = depth + 1), 
                            alpha=-math.inf, 
                            beta=-alpha,

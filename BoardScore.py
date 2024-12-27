@@ -32,7 +32,6 @@ class BoardScore:
         else:
             coefficient = -1
 
-        # TODO 11 * 11 のリストで場所に対応した値を宣言しておいて、それとheadの位置で決定? 
         self.score += coefficient * map_score[head[0]][head[1]]
         
 
