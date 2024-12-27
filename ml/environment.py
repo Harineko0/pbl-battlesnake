@@ -211,13 +211,13 @@ class LocalEnv:
         if self.turn == 0:
             done, cause = self.me.move(action, self.foods)
             if done:
-                # print(cause)
+                print(f"Me: {cause}")
                 self.done = done
             self.turn = 1
         else:
             done, cause = self.you.move(action, self.foods)
             if done:
-                # print(cause)
+                print(f"You: {cause}")
                 self.done = done
             self.turn = 0
         
@@ -278,13 +278,13 @@ class LocalEnv:
         you_h_mat, you_b_mat = self.you.get_state()
         foods_mat = self.foods.get_state()
         
-        return torch.flatten(torch.stack([
-            torch.tensor(me_h_mat, dtype=torch.float32).to(config.device),
-            torch.tensor(me_b_mat, dtype=torch.float32).to(config.device),
-            torch.tensor(you_h_mat, dtype=torch.float32).to(config.device),
-            torch.tensor(you_b_mat, dtype=torch.float32).to(config.device),
-            torch.tensor(foods_mat, dtype=torch.float32).to(config.device)
-        ], dim=0))
+        return torch.stack([
+            torch.tensor(me_h_mat, dtype=torch.float32),
+            torch.tensor(me_b_mat, dtype=torch.float32),
+            torch.tensor(you_h_mat, dtype=torch.float32),
+            torch.tensor(you_b_mat, dtype=torch.float32),
+            torch.tensor(foods_mat, dtype=torch.float32)
+        ], dim=0)
     
     def render(self):
         m_head, m_body = self.me.get_state()

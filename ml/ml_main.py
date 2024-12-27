@@ -8,7 +8,7 @@ import math
 
 print(f"MPS Backend is available? - {"yes" if torch.backends.mps.is_available() else "no"}")
 
-episode_count = 200000
+episode_count = 50000
 sync_interval = 100
 env = LocalEnv()
 ally_agent = Agent(id="ally")
@@ -34,6 +34,8 @@ for episode in range(episode_count):
         agent = ally_agent if is_ally_turn else oppoent_agent
         action = agent.get_action(state)
         next_state, reward, done = env.step(action)
+        if done:
+            print(f"Episode: {episode}, Step: {step}")
         agent.update(state, action, reward, next_state, done)
         state = next_state
         total_reward += reward
@@ -53,6 +55,7 @@ print(f"Elapsed time: {math.floor(elapsed_time / 60)}m {math.floor(elapsed_time 
 ally_agent.save()
 oppoent_agent.save()
 
+# 折れ線グラフ
 plt.plot(reward_history, label="reward")
 plt.plot(step_history, label="step")
 plt.legend()

@@ -3,7 +3,6 @@ from torch import Tensor
 from net import QNet
 import numpy as np
 import file as f
-
 from replay_buffer import ReplayBuffer
 
 class Agent:
@@ -70,3 +69,4 @@ class Agent:
         
         self.qnet.load_state_dict(torch.load(path, weights_only=True))
         self.qnet_target.load_state_dict(torch.load(path, weights_only=True))
+
