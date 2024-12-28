@@ -4,8 +4,7 @@ from numpy.typing import NDArray
 import torch
 from torch.types import Tensor
 from enum import Enum
-import config
-
+import config as c
 
 class Cause(Enum):
     WALL = 0
@@ -110,17 +109,20 @@ class Battlesnake:
         b_mat: ボディの位置を表す行列
     """
     def get_state(self) -> Tuple[NDArray, NDArray]:
-        h_mat = np.zeros((self.size, self.size), dtype=int)
-        h_0, h_1 = self.head
-        if 0 <= h_0 < self.size and 0 <= h_1 < self.size:
-            h_mat[h_0, h_1] = 1
-        
-        b_mat = np.zeros((self.size, self.size), dtype=int)
-        # if body contains out of range position, ignore it
-        safe_body = self.body[(0 <= self.body[:, 0]) & (self.body[:, 0] < self.size) & (0 <= self.body[:, 1]) & (self.body[:, 1] < self.size)]
-        b_mat[safe_body[:, 0], safe_body[:, 1]] = 1
-        
-        return h_mat, b_mat
+        return self.head, self.body
+    
+        # #deprecated:
+        # h_mat = np.zeros((self.size, self.size), dtype=int)
+        # h_0, h_1 = self.head
+        # if 0 <= h_0 < self.size and 0 <= h_1 < self.size:
+        #     h_mat[h_0, h_1] = 1
+        #
+        # b_mat = np.zeros((self.size, self.size), dtype=int)
+        # # if body contains out of range position, ignore it
+        # safe_body = self.body[(0 <= self.body[:, 0]) & (self.body[:, 0] < self.size) & (0 <= self.body[:, 1]) & (self.body[:, 1] < self.size)]
+        # b_mat[safe_body[:, 0], safe_body[:, 1]] = 1
+        #
+        # return h_mat, b_mat
     
     """
     Args:
@@ -157,10 +159,13 @@ class Foods:
         
         
     def get_state(self) -> NDArray:
-        food_mat = np.zeros((self.size, self.size), dtype=int)
-        food_mat[self.food[:, 0], self.food[:, 1]] = 1
+        return self.food
         
-        return food_mat
+        # # deprecated:
+        # food_mat = np.zeros((self.size, self.size), dtype=int)
+        # food_mat[self.food[:, 0], self.food[:, 1]] = 1
+        #
+        # return food_mat
     
     """
     constraints 以外の位置の候補からランダムに size 個の位置を NDArray[Tuple[int, int]] で返す
@@ -211,20 +216,20 @@ class LocalEnv:
         if self.turn == 0:
             done, cause = self.me.move(action, self.foods)
             if done:
-                print(f"Me: {cause}")
+                # print(f"Me: {cause}")
                 self.done = done
             self.turn = 1
         else:
             done, cause = self.you.move(action, self.foods)
             if done:
-                print(f"You: {cause}")
+                # print(f"You: {cause}")
                 self.done = done
             self.turn = 0
         
         state = self.get_state()
         reward = self.get_reward(me=self.me, you=self.you, foods=self.foods, done=done, cause=cause)
         
-        return state, reward, self.done
+        return state, reward, self.done, cause
     
     
     def get_reward(self, me: Battlesnake, you: Battlesnake, foods: Foods, done: bool, cause: Cause) -> float:
@@ -274,17 +279,39 @@ class LocalEnv:
         state: 環境の状態を表す Tensor
     """
     def get_state(self) -> Tensor:
-        me_h_mat, me_b_mat = self.me.get_state()
-        you_h_mat, you_b_mat = self.you.get_state()
-        foods_mat = self.foods.get_state()
+        me_head, me_body = self.me.get_state()
+        you_head, you_body = self.you.get_state()
+        foods = self.foods.get_state()
         
-        return torch.stack([
-            torch.tensor(me_h_mat, dtype=torch.float32),
-            torch.tensor(me_b_mat, dtype=torch.float32),
-            torch.tensor(you_h_mat, dtype=torch.float32),
-            torch.tensor(you_b_mat, dtype=torch.float32),
-            torch.tensor(foods_mat, dtype=torch.float32)
-        ], dim=0)
+        size = self.size * self.size
+        tensor = torch.zeros(size, 5, dtype=torch.float32)
+        
+        idx = self.to_one_hot_idx(*me_head)
+        if 0 < idx and idx < size:
+            tensor[idx, 0] = 1
+        
+        for body in me_body:
+            idx = self.to_one_hot_idx(*body)
+            if 0 < idx and idx < size:
+                tensor[idx, 1] = 1
+        
+        idx = self.to_one_hot_idx(*you_head)
+        if 0 < idx and idx < size:
+            tensor[idx, 2] = 1
+        for body in you_body:
+            idx = self.to_one_hot_idx(*body)
+            if 0 < idx and idx < size:
+                tensor[self.to_one_hot_idx(*body), 3] = 1
+            
+        for food in foods:
+            idx = self.to_one_hot_idx(*food)
+            if 0 < idx and idx < size:
+                tensor[self.to_one_hot_idx(*food), 4] = 1
+        
+        return tensor.to(c.device)
+ 
+    def to_one_hot_idx(self, x: int, y: int) -> int:
+        return x * self.size + y
     
     def render(self):
         m_head, m_body = self.me.get_state()

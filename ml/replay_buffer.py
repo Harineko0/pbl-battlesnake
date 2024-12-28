@@ -1,8 +1,8 @@
 from collections import deque
 import random
-import numpy as np
 from torch import Tensor
 import torch
+import config as c
 
 class ReplayBuffer:
     def __init__(self, buffer_size: int, batch_size: int):
@@ -27,10 +27,10 @@ class ReplayBuffer:
     def get_batch(self) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
         data = random.sample(self.buffer, self.batch_size)
         
-        state = torch.stack([d[0] for d in data])
-        action = torch.tensor([d[1] for d in data])
-        reward = torch.tensor([d[2] for d in data])
-        next_state = torch.stack([d[3] for d in data])
-        done = torch.tensor([1 if d[4] == True else 0 for d in data])
+        state = torch.stack([d[0] for d in data]).to(c.device)
+        action = torch.tensor([d[1] for d in data]).to(c.device)
+        reward = torch.tensor([d[2] for d in data]).to(c.device)
+        next_state = torch.stack([d[3] for d in data]).to(c.device)
+        done = torch.tensor([1 if d[4] == True else 0 for d in data]).to(c.device)
         
         return state, action, reward, next_state, done

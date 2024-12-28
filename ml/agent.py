@@ -1,9 +1,11 @@
 import torch
 from torch import Tensor
+from torch.nn import DataParallel
 from net import QNet
 import numpy as np
 import file as f
 from replay_buffer import ReplayBuffer
+import config as c
 
 class Agent:
     def __init__(self, id: str):
@@ -14,11 +16,16 @@ class Agent:
         self.batch_size = 32
         self.action_size = 4
         self.id = id
-        state_size = 605
+        state_size = 121 * 5
         
         self.replay_buffer = ReplayBuffer(buffer_size=self.buffer_size, batch_size=self.batch_size)
-        self.qnet = QNet(action_size=self.action_size, state_size=state_size)
-        self.qnet_target = QNet(action_size=self.action_size, state_size=state_size)
+        self.qnet = QNet(action_size=self.action_size, state_size=state_size).to(c.device)
+        self.qnet_target = QNet(action_size=self.action_size, state_size=state_size).to(c.device)
+        
+        if c.device == "mps":
+            self.qnet = DataParallel(self.qnet)
+            self.qnet_target = DataParallel(self.qnet_target)
+        
         self.optimizer = torch.optim.Adam(self.qnet.parameters(), lr=self.lr)
         # self.optimizer.add_param_group({'params': self.qnet.parameters()})
 
