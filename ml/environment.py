@@ -238,20 +238,19 @@ class LocalEnv:
 
         match cause:
             case Cause.WALL:
-                return -2 # 壁にぶつかったら多めに減点
+                return -1 # 壁にぶつかったら多めに減点
             case Cause.OUT_OF_HEALTH:
-                return -1
+                return -0.5
             case Cause.HIT_OPPONENT_BODY:
-                return -1
+                return -0.5
             case Cause.HIT_OPPONENT_HEAD:
                 # 体力が多い方が勝ち
                 if len(me) > len(you):
-                    return 1
+                    return 0.5
                 else:
-                    return -1
-                
+                    return -0.5
             case Cause.HIT_MYSELF:
-                return -2 # 自分にぶつかったら多めに減点
+                return -1 # 自分にぶつかったら多めに減点
         
         return 0
 
