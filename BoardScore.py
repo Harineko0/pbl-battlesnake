@@ -12,6 +12,22 @@ map_score=[
     [10, 9, 8, 7, 6, 5, 6, 7, 8, 9, 10]
 ]
 
+"""
+Buta Modified
+#Note that this procedure makes the entire process of this program redundant.#
+#Use this when you want to change map score quickly.#
+
+<Note>
+Isn't declaring map_score ehnever BoardScore.py is called a bit pointless?
+I did not write the original code, but to me declaring map_socore at AlphaBeta.py
+(whatever file that only activate once as a battlesnake run) seems more reasonable.
+--Buhi
+
+"""
+for y in range(11):
+    for x in range(11):
+        map_score[y][x]=abs(5-x)+abs(5-y)
+
 
 class BoardScore:
     """
