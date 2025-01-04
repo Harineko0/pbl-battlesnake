@@ -70,15 +70,19 @@ class BoardScore:
         if(enemy_body[len(enemy_body)][0]==1):
             if(my_body[1][1]!=enemy_body[len(enemy_body)-1][1] and my_body[1][1]!=my_body[2][1] )
                 tmp_map_score[0][enemy_body[len(enemy_body)][1]]=-100
+                self.score += map_score[head[0]][head[1]]
         if(enemy_body[len(enemy_body)][0]==9):
             if(my_body[1][1]!=enemy_body[len(enemy_body)-1][1] and my_body[1][1]!=my_body[2][1] )
                 tmp_map_score[10][enemy_body[len(enemy_body)][1]]=-100
+                self.score += map_score[head[0]][head[1]]
         if(enemy_body[len(enemy_body)][1]==1):
             if(my_body[1][0]!=enemy_body[len(enemy_body)-1][0] and my_body[1][0]!=my_body[2][0] )
                 tmp_map_score[enemy_body[len(enemy_body)][0]][0]=-100
+                self.score += map_score[head[0]][head[1]]
         if(enemy_body[len(enemy_body)][1]==9):
             if(my_body[1][0]!=enemy_body[len(enemy_body)-1][0] and my_body[1][0]!=my_body[2][0] )
-                tmp_map_score[enemy_body[len(enemy_body)][0]][10]=-100             
+                tmp_map_score[enemy_body[len(enemy_body)][0]][10]=-100     
+                self.score += map_score[head[0]][head[1]]
                 
     
     def updateScoreByHead(self, head: tuple[int, int], enemy = False):
