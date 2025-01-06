@@ -36,7 +36,7 @@ Isn't declaring map_score ehnever BoardScore.py is called a bit pointless?
 I did not write the original code, but to me declaring map_socore at AlphaBeta.py
 (whatever file that only activate once as a battlesnake run) seems more reasonable.
 --Buhi
-
+HI!
 """
 for y in range(11):
     for x in range(11):
