@@ -80,7 +80,6 @@ class BoardState:
         if (depth % 2 == 1):
             my_body = self._my_body.copy()
             my_body.insert(0, move)
-            foods = self._foods.copy()
             my_eat_food = None
             if move in self._foods:
                 my_eat_food = move
@@ -89,8 +88,13 @@ class BoardState:
                 my_body.pop()
                 my_health =  self._my_health -1
 
-            enemy_body =  self._enemy_body.copy()
-            enemy_health = self._enemy_health
+            return BoardState(my_body=my_body, 
+                              enemy_body=self._enemy_body,
+                              my_health=my_health,
+                              enemy_health=self._enemy_health,
+                              foods=self._foods,
+                              my_eat_food=my_eat_food
+                              )
         else:
             enemy_body = self._enemy_body.copy()
             enemy_body.insert(0, move)
@@ -102,15 +106,14 @@ class BoardState:
                 enemy_body.pop()
                 enemy_health =  self._enemy_health -1
 
-            my_body =  self._my_body.copy()
-            my_health = self._my_health
             my_eat_food = self._my_eat_food
             if my_eat_food in foods:
                 foods.remove(my_eat_food)
         
-        return BoardState(my_body=my_body, 
-                          enemy_body=enemy_body,
-                          my_health=my_health,
-                          enemy_health=enemy_health,
-                          foods=foods,
-                          my_eat_food=my_eat_food)
+            return BoardState(my_body=self._my_body, 
+                              enemy_body=enemy_body,
+                              my_health=self._my_health,
+                              enemy_health=enemy_health,
+                              foods=foods,
+                              my_eat_food=my_eat_food
+                              )
