@@ -1,4 +1,4 @@
-def getSafeMoves(head: tuple[int, int]):
+def getSafeMoves(head: tuple[int, int], neck: tuple[int, int]) -> list[tuple[int, int]]:
     moves = []
 
     if head[0] != 0:
@@ -9,6 +9,8 @@ def getSafeMoves(head: tuple[int, int]):
         moves.append((head[0] , head[1] - 1))
     if head[1] != 10:
         moves.append((head[0] , head[1] + 1))
+    
+    moves.remove(neck)
 
     return moves
 

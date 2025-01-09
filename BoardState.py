@@ -65,9 +65,9 @@ class BoardState:
         depthが偶数なら自分のターン、奇数なら相手のターンとして合法手を返す
         """
         if (depth % 2 == 0):
-            moves = getSafeMoves(head=self._my_body[0])
+            moves = getSafeMoves(head=self._my_body[0], neck = self._my_body[1])
         else:
-            moves = getSafeMoves(head=self._enemy_body[0])
+            moves = getSafeMoves(head=self._enemy_body[0], neck = self._enemy_body[1])
         
         return moves
 
