@@ -1,13 +1,13 @@
 # Battlesnake Python Starter Project
 ```bash
 # setup venv
-python3 -m venv "battlesnake"
+python3 -m venv ".venv"
 ./battlesnake/Scripts/activate
-pip install -r .\requirements.txt
+pip install -r requirements.txt
 python main.py
 
 # Copy battlesnake.exe to this directory
-./battlesnake.exe play -W 11 -H 11 --name 'PBL 7' --url http://localhost:8000 -g solo --browser
+./battlesnake play --name 'PBL 7' --url http://localhost:8003 --name 'Lv6' --url http://pbl.ics.es.osaka-u.ac.jp:10006 --browser
 ```
 
 ## Getting Started
