@@ -33,6 +33,9 @@ class BoardState:
         board_score.updateScoreByNumOfWays(head=self._my_body[0],my_body=self._my_body,enemy_body=self._enemy_body)
         # 蛇の長さで更新
         board_score.updateScoreByLength(my_body=self._my_body, enemy_body=self._enemy_body)
+        
+        # board_score.updateScoreByFood(my_body=self._my_body, enemy_body=self._enemy_body, foods=self._foods)
+        board_score.updateScoreByDist(my_body=self._my_body, enemy_body=self._enemy_body)
 
         return board_score.score
         

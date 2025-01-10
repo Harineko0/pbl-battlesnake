@@ -54,6 +54,12 @@ def end(game_state: typing.Dict):
 # Valid moves are "up", "down", "left", or "right"
 # See https://docs.battlesnake.com/api/example-move for available data
 def move(game_state: typing.Dict) -> typing.Dict:
+    snakes = game_state["board"]["snakes"]
+    
+    if len(snakes) == 1:
+        print("Game finished (Only one snake left). Moving down")
+        return {"move": "down"}
+    
     my_body = [(body["x"], body["y"]) for body in game_state["board"]["snakes"][my_snake_number]["body"]]
     enemy_body = [(body["x"], body["y"]) for body in game_state["board"]["snakes"][enemy_snake_number]["body"]]
     foods = {(food["x"], food["y"]) for food in game_state["board"]["food"]}
