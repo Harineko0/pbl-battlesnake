@@ -141,6 +141,7 @@ class BoardScore:
             if(num_f == 0):
                 WayofAble = WayofAble + 1
         self.score += WayofAble * WayofAble
+
     def updateScoreByLength(self, 
                             my_body: list[tuple[int, int]],
                             enemy_body: list[tuple[int, int]]
@@ -152,7 +153,48 @@ class BoardScore:
         """
         HIHIHIHI
         """
-        if((length_difference := len(my_body) - len(enemy_body)) > 0):
+        
+        my_len = len(my_body)
+        enemy_len = len(enemy_body)
+        
+        if((length_difference := my_len - enemy_len) > 0):
              self.score += 10
 
-        self.score += length_difference
+        self.score += length_difference + my_len / 4 - enemy_len / 4
+
+    """
+    敵より短い場合は食べ物までの距離を近いほど加点.
+    """
+    # def updateScoreByFood(self, my_body: list[tuple[int, int]], enemy_body: list[tuple[int, int]], foods: set[tuple[int, int]]):
+    #     my_len = len(my_body)
+    #     enemy_len = len(enemy_body)
+    #     weight = 1
+        
+    #     if my_len < enemy_len:
+    #         my_head = my_body[0]
+    #         dist_food = 99999
+            
+    #         for food in foods:
+    #             dist = abs(my_head[0] - food[0]) + abs(my_head[1] - food[1])
+    #             dist_food = min(dist_food, dist)
+            
+    #         if dist_food < 99999:        
+    #             self.score += (20 - dist_food) * weight
+            
+    
+    """
+    敵より長い場合は近ければ加点.
+    殺せる場合は殺しに行く
+    """
+    def updateScoreByDist(self, my_body: list[tuple[int, int]], enemy_body: list[tuple[int, int]]):
+        my_head = my_body[0]
+        enemy_head = enemy_body[0]
+        my_len = len(my_body)
+        enemy_len = len(enemy_body)
+        
+        dist = abs(my_head[0] - enemy_head[0]) + abs(my_head[1] - enemy_head[1])
+            
+        if my_len >= enemy_len: # 引き分けも
+            self.score += 20 - dist
+        else:
+            self.score += dist - 20
