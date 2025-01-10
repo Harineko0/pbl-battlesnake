@@ -20,7 +20,7 @@ def alpha_beta(board_state, alpha, beta, depth, look_ahead_depth):
         score = -alpha_beta(board_state=board_state.next(move, depth=depth + 1), 
                             alpha=-beta, 
                             beta=-alpha, 
-                            depああth=depth + 1,
+                            depth=depth + 1,
                             look_ahead_depth=look_ahead_depth)
         if score > alpha:
             alpha = score
