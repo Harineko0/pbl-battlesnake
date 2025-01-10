@@ -29,7 +29,8 @@ class BoardState:
         # 自分と相手の頭の位置でどうかで更新
         board_score.updateScoreByHead(head=self._my_body[0], enemy=False)
         board_score.updateScoreByHead(head=self._enemy_body[0], enemy=True)
-
+        board_score.updateScoreByGate(my_body=self._my_body, enemy_body=self._enemy_body)
+        board_score.updateScoreByNumOfWays(head=self._my_body[0],my_body=self._my_body,enemy_body=self._enemy_body)
         # 蛇の長さで更新
         board_score.updateScoreByLength(my_body=self._my_body, enemy_body=self._enemy_body)
 
