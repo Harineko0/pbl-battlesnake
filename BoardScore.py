@@ -136,7 +136,7 @@ class BoardScore:
                     num_f = num_f + 1
             
             for bodyene in enemy_body:
-                if((head[0] == bodyene[0]) and (head[1]+11 == bodyene[1])):
+                if((head[0] == bodyene[0]) and (head[1]+1 == bodyene[1])):
                     num_f = num_f + 1
             if(num_f == 0):
                 WayofAble = WayofAble + 1
@@ -195,6 +195,6 @@ class BoardScore:
         dist = abs(my_head[0] - enemy_head[0]) + abs(my_head[1] - enemy_head[1])
             
         if my_len >= enemy_len: # 引き分けも
-            self.score += 20 - dist
+            self.score += (20 - dist) / 8
         else:
-            self.score += dist - 20
+            self.score += (dist - 20) / 8

@@ -80,7 +80,6 @@ class BoardState:
         """
         次の盤面を取得
         """
-        # TODO 餌を食べたターンの処理を改善(引き分けなのに勝利判定になっている)
         if (depth % 2 == 1):
             my_body = self._my_body.copy()
             my_body.insert(0, move)
