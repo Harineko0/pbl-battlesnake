@@ -1,4 +1,4 @@
-def getSafeMoves(head: tuple[int, int], neck: tuple[int, int]) -> list[tuple[int, int]]:
+def getSafeMoves(head, neck):
     moves = []
 
     if head[0] != 0:
@@ -14,7 +14,7 @@ def getSafeMoves(head: tuple[int, int], neck: tuple[int, int]) -> list[tuple[int
 
     return moves
 
-def getDirection(move: tuple[int,int], my_head: tuple[int, int]):
+def getDirection(move, my_head):
     if my_head == (move[0] - 1, move[1]):
         return "right"
     elif my_head == (move[0] + 1, move[1]):

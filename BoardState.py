@@ -3,12 +3,12 @@ from Helpers import getSafeMoves
 
 class BoardState:
     def __init__(self, 
-                 my_body: list[tuple[int, int]],
-                 enemy_body: list[tuple[int, int]],
-                 my_health: int,
-                 enemy_health: int,
-                 foods: set[tuple[int, int]],
-                 my_eat_food: tuple[int, int] = None
+                 my_body,
+                 enemy_body,
+                 my_health,
+                 enemy_health,
+                 foods,
+                 my_eat_food = None
                  ):
         
         # set members
@@ -20,7 +20,7 @@ class BoardState:
         self._my_eat_food = my_eat_food
 
 
-    def getScore(self) -> int:
+    def getScore(self):
         """
         盤面の評価を入手
         """
@@ -40,7 +40,7 @@ class BoardState:
         return board_score.score
         
     
-    def youWin(self) -> bool:
+    def youWin(self):
         """
         勝ちを判定
         """
@@ -52,7 +52,7 @@ class BoardState:
         ])
     
 
-    def youLose(self) -> bool:
+    def youLose(self):
         """
         負け、引き分けを判定
         """
@@ -64,7 +64,7 @@ class BoardState:
         ])
 
 
-    def getLegalMoves(self, depth) -> list[tuple[int, int]]:
+    def getLegalMoves(self, depth):
         """
         depthが偶数なら自分のターン、奇数なら相手のターンとして合法手を返す
         """
@@ -76,7 +76,7 @@ class BoardState:
         return moves
 
 
-    def next(self, move: tuple[int, int], depth: int):
+    def next(self, move, depth):
         """
         次の盤面を取得
         """
